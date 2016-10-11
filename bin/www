@@ -8,7 +8,7 @@ var appModule = require('../app');
 var app = appModule.app;
 var debug = require('debug')('messaging-base:server');
 var http = require('http');
-var https = require('https');
+// var https = require('https');
 var fs = require('fs');
 var easyrtc = require('../easyrtc-server/easyrtc_server');
 /**
@@ -22,10 +22,7 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-var server = https.createServer({
-      key: fs.readFileSync('key.pem'),
-      cert: fs.readFileSync('cert.pem')
-    }, app);
+var server = http.createServer(app);
 
 // var sessionStore = require('./sessionStore');
 //Init Socket io.
