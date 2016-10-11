@@ -1,0 +1,81 @@
+<section class="section_profile_update">
+	<div class="container">
+		<div class="back_to col-md-12">
+			<a class="btn" href="#/profile">&larr; Back to profile</a>
+		</div>
+		<div class="profile_edit_form">
+			<form ng-submit="updateProfile();">
+				<div class="col-md-6">
+					<!--====== TITLE =====-->
+					<div class="form-group">
+				    	<label for="title">Title</label>
+				    	<input type="text" class="form-control" id="title" ng-model="myProfile.title" placeholder="First name">
+				  	</div>
+					
+					<!--====== FIRST NAME=====-->
+					<div class="form-group">
+				    	<label for="first_name">First name</label>
+				    	<input type="text" class="form-control" id="first_name" ng-model="myProfile.first_name" placeholder="First name">
+				  	</div>
+					
+					<!--====== LAST NAME=====-->
+				  	<div class="form-group">
+				    	<label for="last_name">Last name</label>
+				    	<input type="text" class="form-control" id="last_name" ng-model="myProfile.last_name" placeholder="Last name">
+				  	</div>
+					
+					<!--====== USERNAME =====-->
+					<div class="form-group">
+				    	<label for="username">Username</label>
+				    	<input type="text" class="form-control" id="username" disabled ng-model="myProfile.username">
+				  	</div>
+					
+					<!--====== EMAIL =====-->
+					<div class="form-group">
+						<label for="email">Email address</label>
+						<input type="email" class="form-control" id="email" ng-model="myProfile.email" placeholder="Email">
+					</div>
+					
+					<!--====== WEBSITE =====-->
+					<div class="form-group">
+						<label for="website">Website</label>
+						<input type="text" class="form-control" id="website" ng-model="myProfile.website" placeholder="Website">
+					</div>
+					
+					<!--====== LOCATION =====-->
+					<div class="form-group">
+						<label for="location">Location</label>
+						<input type="text" class="form-control" id="location" ng-model="myProfile.location" placeholder="Location">
+					</div>
+				
+				</div>
+				
+				<div class="col-md-6">
+					<!--====== BIO  =====-->
+					<div class="form-group">
+						<label for="bio">Bio</label>
+						<textarea class="form-control" name="bio" id="bio" cols="30" rows="10" placeholder="Bio" ng-model="myProfile.bio"></textarea>
+					</div>
+					
+					<!--====== AGE  =====-->
+					<div class="form-group">
+						<label for="age">Age</label>
+						<input type="number" class="form-control" name="age" id="age" placeholder="age" ng-model="myProfile.age">
+					</div>
+					
+					<!--====== RESET PASSWORD =====-->
+					<div class="form-group">
+						<p class="text-warning" ng-show="!form_errors.isMatch">Password doesn't match</p>
+						<label for="password">New Password</label>
+						<input type="password" class="form-control" id="password" ng-keyup="isMatch()" ng-model="myProfile.new_password" placeholder="Password">
+
+						<label for="repassword">Retype Password</label>
+						<input type="password" class="form-control" id="repassword" ng-keyup="isMatch()" ng-model="myProfile.re_password" placeholder="Retype Password">
+					</div>
+					<button type="submit" class="btn">Update profile</button>
+				</div>
+				
+			</form>
+		</div>
+	</div>
+</section>

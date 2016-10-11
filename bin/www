@@ -1,0 +1,165 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var appModule = require('../app');
+var app = appModule.app;
+var debug = require('debug')('messaging-base:server');
+var http = require('http');
+var https = require('https');
+var fs = require('fs');
+var easyrtc = require('../easyrtc-server/easyrtc_server');
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = https.createServer({
+      key: fs.readFileSync('key.pem'),
+      cert: fs.readFileSync('cert.pem')
+    }, app);
+
+// var sessionStore = require('./sessionStore');
+//Init Socket io.
+var io = require('socket.io').listen(server, {"log level":1});
+
+var passportSocketIo = require('passport.socketio');
+io.use(passportSocketIo.authorize({
+  cookieParser: appModule.cookieParser,
+  key: 'connect.sid',
+  secret: 'session-secret',
+  store: appModule.sessionStore,
+  success: onAuthorizeSuccess,
+  fail: onAuthorizeFail,
+}));
+
+function onAuthorizeSuccess(data, accept){
+  console.log('successful connection to socket.io');
+  accept();
+}
+
+function onAuthorizeFail(data, message, error, accept){
+  console.log('failed connection to socket.io:');
+  if(error)
+    accept(new Error(message));
+}
+
+require('../routes/api.message')(io);
+
+
+
+/***
+ * EasyRTC server setup
+ */
+
+easyrtc.setOption("logLevel", "debug");
+
+// Overriding the default easyrtcAuth listener, only so we can directly access its callback
+easyrtc.events.on("easyrtcAuth", function(socket, easyrtcid, msg, socketCallback, callback) {
+    easyrtc.events.defaultListeners.easyrtcAuth(socket, easyrtcid, msg, socketCallback, function(err, connectionObj){
+        if (err || !msg.msgData || !msg.msgData.credential || !connectionObj) {
+            callback(err, connectionObj);
+            return;
+        }
+
+        connectionObj.setField("credential", msg.msgData.credential, {"isShared":false});
+
+        console.log("["+easyrtcid+"] Credential saved!", connectionObj.getFieldValueSync("credential"));
+
+        callback(err, connectionObj);
+    });
+});
+
+// To test, lets print the credential to the console for every room join!
+easyrtc.events.on("roomJoin", function(connectionObj, roomName, roomParameter, callback) {
+    console.log("["+connectionObj.getEasyrtcid()+"] Credential retrieved!", connectionObj.getFieldValueSync("credential"));
+    easyrtc.events.defaultListeners.roomJoin(connectionObj, roomName, roomParameter, callback);
+});
+
+// Start EasyRTC server
+var rtc = easyrtc.listen(app, io, null, function(err, rtcRef) {
+    console.log("Initiated");
+
+    rtcRef.events.on("roomCreate", function(appObj, creatorConnectionObj, roomName, roomOptions, callback) {
+        console.log("roomCreate fired! Trying to create: " + roomName);
+
+        appObj.events.defaultListeners.roomCreate(appObj, creatorConnectionObj, roomName, roomOptions, callback);
+    });
+});
+
+
+
+
+
+
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}

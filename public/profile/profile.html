@@ -1,0 +1,45 @@
+<section class="section_user">
+	<div class="container">
+		<div class="col-md-4 sidebar user_sidebar sidebar_left box">
+			<ul class="profile_admin_menu">
+				<li><a href="#/profile/edit">Edit profile</a></li>
+				<li><a href="#/new-job">Add a job</a></li>
+				<li><a href="#/messages">message</a></li>
+			</ul>
+			<h4 class="sidebar_title">Details</h4>
+			<table>
+				<tbody>
+					<tr>
+						<td>Name:</td>
+						<td>{{userProfile.first_name}} {{userProfile.last_name}}</td>
+					</tr>
+					<tr>
+						<td>Age:</td>
+						<td>{{userProfile.age}}</td>
+					</tr>
+					<tr>
+						<td>Location:</td>
+						<td>{{userProfile.location}}</td>
+					</tr>
+					<tr>
+						<td>Email:</td>
+						<td>{{userProfile.email}}</td>
+					</tr>
+					<tr>
+						<td>Website</td>
+						<td><a href="{{userProfile.website}}">{{userProfile.website}}</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="col-md-8 user_body rightside_body">
+			<div class="box">
+				<h3 class="user_name">{{userProfile.first_name}} {{userProfile.last_name}}</h3>
+				<div class="user_title">{{userProfile.title}}</div>
+				
+				<div class="user_bio">{{userProfile.bio}}</div>				
+			</div>
+		</div>
+	</div>
+</section>
